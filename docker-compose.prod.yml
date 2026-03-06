@@ -1,6 +1,6 @@
 services:
   web:
-    image: ${DOCKERHUB_USERNAME}/portfolio:latest
+    image: bern4/portfolio-web:latest
     container_name: portfolio_web
     env_file: .env
     volumes:
