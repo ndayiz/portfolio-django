@@ -107,6 +107,11 @@
                 class="gradient-text"></span>
         </div>
 
+        <!-- Summary -->
+        {% if profile.summary %}
+          <p class="mt-5 text-blue-100/80 text-sm sm:text-base leading-relaxed max-w-lg">{{ profile.summary }}</p>
+        {% endif %}
+
         <!-- CTA row -->
         <div class="mt-9 flex flex-wrap gap-2.5 sm:gap-3">
           <a href="#featured-projects"
@@ -199,15 +204,8 @@
         The Person Behind<br>the <span class="gradient-text">Code</span>
       </h2>
 
-      <!-- Decorative opening quote -->
-      <div class="mt-8 relative pl-5 border-l-2 border-brand/40">
-        <p class="text-gray-700 text-[1.05rem] leading-[1.85] italic">
-          "{{ profile.summary }}"
-        </p>
-      </div>
-
       {% if profile.about %}
-        <p class="mt-6 text-gray-500 text-sm leading-[1.85]">{{ profile.about }}</p>
+        <p class="mt-8 text-gray-600 text-[1.05rem] leading-[1.85]">{{ profile.about }}</p>
       {% endif %}
 
       <!-- CTA inside About -->
@@ -502,20 +500,20 @@
     <p class="mt-2 text-gray-500 text-sm">Tools and technologies I work with — hover to highlight.</p>
   </div>
 
-  <div class="grid md:grid-cols-2 gap-6">
+  <div class="grid md:grid-cols-3 gap-6">
 
-    <div class="g-card rounded-2xl p-7" data-aos="fade-right">
+    <div class="g-card rounded-md p-7" data-aos="fade-up">
       <div class="flex items-center gap-3 mb-6">
         <div class="w-10 h-10 rounded-md flex items-center justify-center text-brand"
              style="background: rgba(0,178,255,.1); border: 1px solid rgba(0,178,255,.2);">
           <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
         </div>
-        <span class="font-display font-bold text-base text-gray-900">Technical Skills</span>
+        <span class="font-display font-bold text-base text-gray-900">Technical</span>
         <span class="ml-auto text-xs text-gray-400">{{ technical_skills|length }} skills</span>
       </div>
       <div class="flex flex-wrap gap-2">
         {% for s in technical_skills %}
-          <span class="skill-tech px-4 py-2 rounded-md text-sm font-semibold cursor-default
+          <span class="px-4 py-2 rounded-md text-sm font-semibold cursor-default
                        text-brand border border-brand/20"
                 style="background: rgba(0,178,255,.08);">{{ s.name }}</span>
         {% empty %}
@@ -524,7 +522,27 @@
       </div>
     </div>
 
-    <div class="g-card rounded-2xl p-7" data-aos="fade-left">
+    <div class="g-card rounded-md p-7" data-aos="fade-up" data-aos-delay="100">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-md flex items-center justify-center text-red-500"
+             style="background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.2);">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        </div>
+        <span class="font-display font-bold text-base text-gray-900">Security</span>
+        <span class="ml-auto text-xs text-gray-400">{{ security_skills|length }} skills</span>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        {% for s in security_skills %}
+          <span class="px-4 py-2 rounded-md text-sm font-semibold cursor-default
+                       text-red-600 border border-red-400/30"
+                style="background: rgba(239,68,68,.08);">{{ s.name }}</span>
+        {% empty %}
+          <div class="text-gray-400 text-sm">Add security skills in Admin.</div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="g-card rounded-md p-7" data-aos="fade-up" data-aos-delay="200">
       <div class="flex items-center gap-3 mb-6">
         <div class="w-10 h-10 rounded-md flex items-center justify-center text-purple-500"
              style="background: rgba(168,85,247,.1); border: 1px solid rgba(168,85,247,.2);">
@@ -535,7 +553,7 @@
       </div>
       <div class="flex flex-wrap gap-2">
         {% for s in soft_skills %}
-          <span class="skill-soft px-4 py-2 rounded-md text-sm font-semibold cursor-default
+          <span class="px-4 py-2 rounded-md text-sm font-semibold cursor-default
                        text-purple-600 border border-purple-400/30"
                 style="background: rgba(168,85,247,.08);">{{ s.name }}</span>
         {% empty %}

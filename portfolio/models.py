@@ -81,6 +81,7 @@ class Project(models.Model):
 class Skill(models.Model):
     SKILL_TYPES = [
         ("Technical", "Technical"),
+        ("Security", "Security"),
         ("Soft", "Soft"),
     ]
 

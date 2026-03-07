@@ -18,6 +18,7 @@ def home(request):
     education = Education.objects.all().order_by("-id")
 
     technical_skills = Skill.objects.filter(skill_type="Technical").order_by("name")
+    security_skills = Skill.objects.filter(skill_type="Security").order_by("name")
     soft_skills = Skill.objects.filter(skill_type="Soft").order_by("name")
 
     certificates = Certificate.objects.all().order_by("-id")
@@ -50,6 +51,7 @@ def home(request):
         "experiences": experiences,
         "education": education,
         "technical_skills": technical_skills,
+        "security_skills": security_skills,
         "soft_skills": soft_skills,
         "certificates": certificates,
         "testimonials": testimonials,
