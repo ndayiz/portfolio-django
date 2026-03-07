@@ -1,3 +1,4 @@
+import datetime
 from django.db import models
 
 
@@ -30,6 +31,11 @@ class Experience(models.Model):
         ("Internship", "Internship"),
         ("Freelance", "Freelance"),
     ]
+    WORK_MODES = [
+        ("On-site", "On-site"),
+        ("Remote", "Remote"),
+        ("Hybrid", "Hybrid"),
+    ]
 
     title = models.CharField(max_length=150)
     employment_type = models.CharField(max_length=50, choices=EMPLOYMENT_TYPES, blank=True)
@@ -40,7 +46,21 @@ class Experience(models.Model):
     currently_working = models.BooleanField(default=False)
 
     location = models.CharField(max_length=120, blank=True)
+    work_mode = models.CharField(max_length=20, choices=WORK_MODES, blank=True)
     description = models.TextField(blank=True)
+
+    @property
+    def duration(self):
+        end = self.end_date if self.end_date else datetime.date.today()
+        months = (end.year - self.start_date.year) * 12 + (end.month - self.start_date.month) + 1
+        if months < 1:
+            return "< 1 mo"
+        years, mos = divmod(months, 12)
+        if years and mos:
+            return f"{years} yr {mos} mo{'s' if mos > 1 else ''}"
+        if years:
+            return f"{years} yr{'s' if years > 1 else ''}"
+        return f"{mos} mo{'s' if mos > 1 else ''}"
 
     def __str__(self):
         return f"{self.title} - {self.company}"

@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.contrib import messages
+from django.core.mail import send_mail
+from django.conf import settings
 
 from .models import (
     Profile, Experience, Education, Project,
@@ -14,13 +16,28 @@ def home(request):
     featured_projects = Project.objects.filter(featured=True).order_by("-id")[:5]
     projects = Project.objects.all().order_by("-id")
 
+    import datetime as _dt
     _experiences = Experience.objects.all().order_by("-currently_working", "-start_date")
     _grouped = {}
     for exp in _experiences:
         if exp.company not in _grouped:
             _grouped[exp.company] = []
         _grouped[exp.company].append(exp)
-    experiences = list(_grouped.items())  # [(company, [exp, exp, ...]), ...]
+
+    def _total_duration(roles):
+        earliest = min(r.start_date for r in roles)
+        latest = max((r.end_date if r.end_date else _dt.date.today()) for r in roles)
+        months = (latest.year - earliest.year) * 12 + (latest.month - earliest.month) + 1
+        if months < 1:
+            return "< 1 mo"
+        years, mos = divmod(months, 12)
+        if years and mos:
+            return f"{years} yr {mos} mo{'s' if mos > 1 else ''}"
+        if years:
+            return f"{years} yr{'s' if years > 1 else ''}"
+        return f"{mos} mo{'s' if mos > 1 else ''}"
+
+    experiences = [(company, roles, _total_duration(roles)) for company, roles in _grouped.items()]
     education = Education.objects.all().order_by("-start_year")
 
     technical_skills = Skill.objects.filter(skill_type="Technical").order_by("name")
@@ -46,6 +63,17 @@ def home(request):
             subject=subject,
             message=message_txt
         )
+
+        try:
+            send_mail(
+                subject=f"Portfolio Contact: {subject or 'New message'} — from {name}",
+                message=f"Name: {name}\nEmail: {email}\n\n{message_txt}",
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[settings.CONTACT_RECIPIENT_EMAIL],
+                fail_silently=False,
+            )
+        except Exception:
+            pass  # message is saved to DB even if email fails
 
         messages.success(request, "Thanks! Your message has been sent.")
         return redirect("home")
