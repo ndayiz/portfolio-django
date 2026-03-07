@@ -420,11 +420,10 @@
     <p class="mt-2 text-gray-500 text-sm">The roles and companies that have shaped my professional journey.</p>
   </div>
 
-  <div class="ml-6 sm:ml-10 pl-8 sm:pl-12 timeline-track space-y-0">
+  <div class="space-y-4">
     {% for company, roles, total_duration in experiences %}
-      <div class="relative pb-10 last:pb-0" data-aos="fade-up">
-        <div class="timeline-dot"></div>
-        <div class="g-card rounded-md ml-2 overflow-hidden">
+      <div data-aos="fade-up">
+        <div class="g-card rounded-md overflow-hidden">
 
           {% with first=roles.0 %}
           {% if roles|length == 1 %}
