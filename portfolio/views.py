@@ -14,14 +14,20 @@ def home(request):
     featured_projects = Project.objects.filter(featured=True).order_by("-id")[:5]
     projects = Project.objects.all().order_by("-id")
 
-    experiences = Experience.objects.all().order_by("-id")
-    education = Education.objects.all().order_by("-id")
+    _experiences = Experience.objects.all().order_by("-currently_working", "-start_date")
+    _grouped = {}
+    for exp in _experiences:
+        if exp.company not in _grouped:
+            _grouped[exp.company] = []
+        _grouped[exp.company].append(exp)
+    experiences = list(_grouped.items())  # [(company, [exp, exp, ...]), ...]
+    education = Education.objects.all().order_by("-start_year")
 
     technical_skills = Skill.objects.filter(skill_type="Technical").order_by("name")
     security_skills = Skill.objects.filter(skill_type="Security").order_by("name")
     soft_skills = Skill.objects.filter(skill_type="Soft").order_by("name")
 
-    certificates = Certificate.objects.all().order_by("-id")
+    certificates = Certificate.objects.all().order_by("-year")
     testimonials = Testimonial.objects.all().order_by("-id")[:3]
 
     if request.method == "POST":
