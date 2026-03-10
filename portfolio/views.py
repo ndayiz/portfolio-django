@@ -1,3 +1,5 @@
+import datetime
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.contrib import messages
@@ -10,13 +12,26 @@ from .models import (
 )
 
 
+def _company_duration(roles):
+    earliest = min(r.start_date for r in roles)
+    latest = max((r.end_date if r.end_date else datetime.date.today()) for r in roles)
+    months = (latest.year - earliest.year) * 12 + (latest.month - earliest.month) + 1
+    if months < 1:
+        return "< 1 mo"
+    years, mos = divmod(months, 12)
+    if years and mos:
+        return f"{years} yr {mos} mo{'s' if mos > 1 else ''}"
+    if years:
+        return f"{years} yr{'s' if years > 1 else ''}"
+    return f"{mos} mo{'s' if mos > 1 else ''}"
+
+
 def home(request):
     profile = Profile.objects.first()
 
-    featured_projects = Project.objects.filter(featured=True).order_by("-id")[:5]
-    projects = Project.objects.all().order_by("-id")
+    featured_projects = Project.objects.filter(featured=True).order_by("order", "-id")[:5]
+    projects = Project.objects.all().order_by("order", "-id")
 
-    import datetime as _dt
     _experiences = Experience.objects.all().order_by("-currently_working", "-start_date")
     _grouped = {}
     for exp in _experiences:
@@ -24,30 +39,30 @@ def home(request):
             _grouped[exp.company] = []
         _grouped[exp.company].append(exp)
 
-    def _total_duration(roles):
-        earliest = min(r.start_date for r in roles)
-        latest = max((r.end_date if r.end_date else _dt.date.today()) for r in roles)
-        months = (latest.year - earliest.year) * 12 + (latest.month - earliest.month) + 1
-        if months < 1:
-            return "< 1 mo"
-        years, mos = divmod(months, 12)
-        if years and mos:
-            return f"{years} yr {mos} mo{'s' if mos > 1 else ''}"
-        if years:
-            return f"{years} yr{'s' if years > 1 else ''}"
-        return f"{mos} mo{'s' if mos > 1 else ''}"
-
-    experiences = [(company, roles, _total_duration(roles)) for company, roles in _grouped.items()]
+    experiences = [(company, roles, _company_duration(roles)) for company, roles in _grouped.items()]
     education = Education.objects.all().order_by("-start_year")
 
-    technical_skills = Skill.objects.filter(skill_type="Technical").order_by("name")
-    security_skills = Skill.objects.filter(skill_type="Security").order_by("name")
-    soft_skills = Skill.objects.filter(skill_type="Soft").order_by("name")
+    technical_skills = Skill.objects.filter(skill_type="Technical").order_by("order", "name")
+    security_skills = Skill.objects.filter(skill_type="Security").order_by("order", "name")
+    soft_skills = Skill.objects.filter(skill_type="Soft").order_by("order", "name")
 
     certificates = Certificate.objects.all().order_by("-year")
     testimonials = Testimonial.objects.all().order_by("-id")[:3]
 
+    # Total years of experience (earliest start date across all experiences)
+    all_exps = Experience.objects.all()
+    if all_exps.exists():
+        earliest = min(e.start_date for e in all_exps)
+        total_months = (datetime.date.today().year - earliest.year) * 12 + (datetime.date.today().month - earliest.month) + 1
+        total_exp_years = max(1, round(total_months / 12))
+    else:
+        total_exp_years = 0
+
     if request.method == "POST":
+        # Honeypot check — bots fill hidden fields, humans don't
+        if request.POST.get("website", ""):
+            return redirect("home")
+
         name = request.POST.get("name", "").strip()
         email = request.POST.get("email", "").strip()
         subject = request.POST.get("subject", "").strip()
@@ -89,6 +104,7 @@ def home(request):
         "soft_skills": soft_skills,
         "certificates": certificates,
         "testimonials": testimonials,
+        "total_exp_years": total_exp_years,
     })
 
 
@@ -99,6 +115,14 @@ def project_detail(request, pk):
         "profile": profile,
         "project": project
     })
+
+
+def handler404(request, exception=None):
+    return render(request, "404.html", status=404)
+
+
+def handler500(request):
+    return render(request, "500.html", status=500)
 
 
 def robots_txt(request):

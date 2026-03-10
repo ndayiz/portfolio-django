@@ -88,7 +88,11 @@ class Project(models.Model):
     live_url = models.URLField(blank=True)
 
     featured = models.BooleanField(default=False)
+    order = models.PositiveIntegerField(default=0)
     created_at = models.DateField(blank=True, null=True)
+
+    class Meta:
+        ordering = ["order", "-id"]
 
     @property
     def tech_list(self):
@@ -104,9 +108,20 @@ class Skill(models.Model):
         ("Security", "Security"),
         ("Soft", "Soft"),
     ]
+    LEVELS = [
+        (25,  "Beginner"),
+        (50,  "Intermediate"),
+        (75,  "Advanced"),
+        (100, "Expert"),
+    ]
 
     name = models.CharField(max_length=80)
     skill_type = models.CharField(max_length=20, choices=SKILL_TYPES, default="Technical")
+    level = models.PositiveSmallIntegerField(choices=LEVELS, default=75)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["order", "name"]
 
     def __str__(self):
         return self.name

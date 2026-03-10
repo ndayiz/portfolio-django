@@ -48,6 +48,39 @@
   <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css"/>
   <title>{% block title %}Portfolio{% endblock %}</title>
 
+  {% if profile %}
+  <!-- Meta description -->
+  <meta name="description" content="{{ profile.summary|default:profile.headline }}">
+  <meta name="author" content="{{ profile.full_name }}">
+
+  <!-- Open Graph (LinkedIn, WhatsApp, Facebook previews) -->
+  <meta property="og:type"        content="website">
+  <meta property="og:title"       content="{{ profile.full_name }} — {{ profile.headline }}">
+  <meta property="og:description" content="{{ profile.summary|default:profile.headline }}">
+  <meta property="og:url"         content="{{ request.build_absolute_uri }}">
+  {% if profile.photo %}<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ profile.photo.url }}">{% endif %}
+
+  <!-- Twitter card -->
+  <meta name="twitter:card"        content="summary_large_image">
+  <meta name="twitter:title"       content="{{ profile.full_name }} — {{ profile.headline }}">
+  <meta name="twitter:description" content="{{ profile.summary|default:profile.headline }}">
+  {% if profile.photo %}<meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ profile.photo.url }}">{% endif %}
+
+  <!-- JSON-LD structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "{{ profile.full_name }}",
+    "jobTitle": "{{ profile.headline }}",
+    "email": "{{ profile.email }}",
+    "url": "{{ request.scheme }}://{{ request.get_host }}/",
+    {% if profile.photo %}"image": "{{ request.scheme }}://{{ request.get_host }}{{ profile.photo.url }}",{% endif %}
+    {% if profile.linkedin_url %}"sameAs": ["{{ profile.linkedin_url }}"{% if profile.github_url %}, "{{ profile.github_url }}"{% endif %}]{% endif %}
+  }
+  </script>
+  {% endif %}
+
   <style>
     /* ── Base ──────────────────────────────────────── */
     html { scroll-behavior: smooth; overflow-x: hidden; }
@@ -59,7 +92,7 @@
 
     /* ── Hero background ───────────────────────────── */
     .mesh-bg {
-      background: linear-gradient(135deg, #0f172a 0%, #0c2340 45%, #0369a1 100%);
+      background: linear-gradient(135deg, #030712 0%, #0f172a 50%, #0c2340 100%);
     }
 
     /* ── Gradient text ─────────────────────────────── */
@@ -185,10 +218,7 @@
 
     /* ── Counter ───────────────────────────────────── */
     .stat-num {
-      background: linear-gradient(135deg, #00B2FF, #a855f7);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: #00B2FF;
     }
 
     /* ── Shimmer btn ───────────────────────────────── */
@@ -211,17 +241,25 @@
     .btn-brand:hover::after { left: 125%; }
     .btn-brand:hover { opacity: .95; box-shadow: 0 0 24px rgba(0,178,255,.35); }
 
-    /* ── Project card image reveal ─────────────────── */
-    .proj-card .reveal {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height .4s cubic-bezier(.4,0,.2,1);
-    }
-    .proj-card:hover .reveal { max-height: 8rem; }
+    /* ── Project card image ─────────────────────────── */
     .proj-card .proj-img {
       transition: transform .5s cubic-bezier(.4,0,.2,1);
     }
     .proj-card:hover .proj-img { transform: scale(1.06); }
+
+    /* ── Project hover overlay ──────────────────────── */
+    .proj-overlay {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .3s ease;
+    }
+    .proj-card:hover .proj-overlay {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* ── Wave divider ───────────────────────────────── */
+    .wave-divider { line-height: 0; overflow: hidden; }
   </style>
 </head>
 
@@ -276,9 +314,9 @@
   </header>
 
   {% if messages %}
-    <div class="fixed top-20 right-5 z-50 space-y-2 w-72 sm:w-80">
+    <div id="toast-container" class="fixed top-20 right-5 z-50 space-y-2 w-72 sm:w-80">
       {% for m in messages %}
-        <div class="bg-white rounded-md border shadow-md px-4 py-3 text-sm
+        <div class="toast-msg bg-white rounded-md border shadow-md px-4 py-3 text-sm transition-all duration-500
           {% if m.tags == 'success' %}border-green-400 text-green-700
           {% elif m.tags == 'error'  %}border-red-400   text-red-700
           {% else                    %}border-gray-200  text-gray-700{% endif %}">
@@ -286,6 +324,15 @@
         </div>
       {% endfor %}
     </div>
+    <script>
+      setTimeout(() => {
+        document.querySelectorAll(".toast-msg").forEach(el => {
+          el.style.opacity = "0";
+          el.style.transform = "translateX(20px)";
+          setTimeout(() => el.remove(), 500);
+        });
+      }, 3000);
+    </script>
   {% endif %}
 
   <main id="top" class="pt-16">
