@@ -92,7 +92,7 @@
 
     /* ── Hero background ───────────────────────────── */
     .mesh-bg {
-      background: linear-gradient(135deg, #030712 0%, #0f172a 50%, #0c2340 100%);
+      background: #1a3a8a;
     }
 
     /* ── Gradient text ─────────────────────────────── */
@@ -151,13 +151,6 @@
       background: #00B2FF;
       border: 2px solid #ffffff;
       box-shadow: 0 0 8px rgba(0,178,255,.5);
-    }
-
-    /* ── Scroll progress ───────────────────────────── */
-    #progress-bar {
-      position: fixed; top: 0; left: 0; height: 3px;
-      background: #00B2FF;
-      z-index: 9999; width: 0; transition: width .12s linear;
     }
 
     /* ── Typewriter cursor ─────────────────────────── */
@@ -264,8 +257,6 @@
 </head>
 
 <body class="font-sans bg-gray-50 text-gray-900 selection:bg-brand/20 selection:text-brand antialiased overflow-x-hidden">
-
-  <div id="progress-bar"></div>
 
   <!-- ── Navbar ──────────────────────────────────── -->
   <header id="navbar" class="fixed top-0 w-full z-50 bg-blue-900 shadow-sm transition-all duration-300">
@@ -387,14 +378,10 @@
   <script>
     AOS.init({ duration: 700, once: true, offset: 55, easing: "ease-out-cubic" });
 
-    const progressBar = document.getElementById("progress-bar");
     const navbar      = document.getElementById("navbar");
     const scrollTopBtn = document.getElementById("scrollTopBtn");
 
     window.addEventListener("scroll", () => {
-      const pct = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
-      progressBar.style.width = Math.min(pct, 100) + "%";
-
       if (window.scrollY > 60) {
         navbar.classList.add("shadow-md");
       } else {
