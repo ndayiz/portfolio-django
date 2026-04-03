@@ -691,9 +691,9 @@
           <div class="min-w-0 flex-1">
             <div class="font-display font-bold text-sm text-gray-900 leading-snug">{{ c.title }}</div>
             <div class="mt-0.5 text-gray-500 text-xs font-medium">{{ c.issuer }}</div>
-            {% if c.year %}
+            {% if c.issued_date %}
               <span class="mt-2 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
-                {{ c.year }}
+                {{ c.issued_date|date:"M Y" }}
               </span>
             {% endif %}
             {% if c.link %}

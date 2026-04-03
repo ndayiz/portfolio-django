@@ -130,7 +130,7 @@ class Skill(models.Model):
 class Certificate(models.Model):
     title = models.CharField(max_length=150)
     issuer = models.CharField(max_length=120, blank=True)
-    year = models.CharField(max_length=10, blank=True)
+    issued_date = models.DateField(null=True, blank=True)
     link = models.URLField(blank=True)
 
     def __str__(self):
