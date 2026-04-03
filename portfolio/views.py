@@ -46,7 +46,7 @@ def home(request):
     security_skills = Skill.objects.filter(skill_type="Security").order_by("order", "name")
     soft_skills = Skill.objects.filter(skill_type="Soft").order_by("order", "name")
 
-    certificates = Certificate.objects.all().order_by("-year")
+    certificates = Certificate.objects.all().order_by("-issued_date")
     testimonials = Testimonial.objects.all().order_by("-id")[:3]
 
     # Total years of experience (earliest start date across all experiences)
